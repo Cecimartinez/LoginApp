@@ -55,6 +55,14 @@ def login_user():
 
         user = User.query.filter_by(email=email).first()
 
+
+        if user is None:
+            return jsonify({"error":"Unauthorized Access"}), 401
+        
+        if not bcrypt.check_password_hash(user.password, password):
+            return jsonify({"error":"Unauthorized"}), 401
+
+
         if user and bcrypt.check_password_hash(user.password, password):
             return jsonify({
                 "id": user.id,
@@ -62,6 +70,7 @@ def login_user():
             })
         else:
             return jsonify({"error": "Invalid email or password"}), 401
+        
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
